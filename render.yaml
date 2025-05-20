@@ -1,0 +1,20 @@
+<<<<<<< HEAD
+services:
+  - type: web
+    name: brightside-shopify-assistant
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+=======
+services:
+  - type: web
+    name: brightside-shopify-assistant
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+>>>>>>> 5b0395defedacedff1430d79331dac0da3f9a6fa
+        value: 3.11.11 
