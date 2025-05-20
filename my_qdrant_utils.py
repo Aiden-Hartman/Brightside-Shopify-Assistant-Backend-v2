@@ -25,12 +25,22 @@ class QdrantClient:
         logger.debug("INITIALIZING QDRANT CLIENT")
         logger.debug("="*50)
         
-        # Use hardcoded values for testing
-        base_url = "7bc04bf8-4c16-41c2-980a-153ec3d2aa0f.us-east-1-0.aws.cloud.qdrant.io"
-        self.url = f"https://{base_url}:443"  # Explicitly use HTTPS with port 443
-        self.api_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.OWrnILnSEO0ctzD1r5jtaDvKlTaF4t_7a_zpJsUN11M"
+        # Get configuration from environment variables
+        self.url = os.getenv("QDRANT_URL")
+        self.api_key = os.getenv("QDRANT_API_KEY")
         self.collection_name = "brightside-products"
         self.vector_size = 1536  # OpenAI text-embedding-3-small model dimension
+        
+        # Validate required environment variables
+        if not self.url:
+            error_msg = "QDRANT_URL not found. Please add it to your .env file."
+            logger.error(error_msg)
+            raise ValueError(error_msg)
+            
+        if not self.api_key:
+            error_msg = "QDRANT_API_KEY not found. Please add it to your .env file."
+            logger.error(error_msg)
+            raise ValueError(error_msg)
         
         logger.debug("Configuration:")
         logger.debug(f"- URL: {self.url}")
@@ -197,7 +207,7 @@ class QdrantClient:
                 except_value = [str(v).lower() if isinstance(v, bool) else v for v in except_value]
                 return FieldCondition(
                     key=key,
-                    match=MatchExcept(except=except_value)
+                    match=MatchExcept(except_values=except_value)
                 )
             elif 'any' in value:
                 # Handle ANY condition
