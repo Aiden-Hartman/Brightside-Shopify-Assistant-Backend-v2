@@ -204,6 +204,7 @@ class QdrantClient:
                 except_value = value['not']
                 if not isinstance(except_value, list):
                     except_value = [except_value]
+                # Don't convert booleans to strings
                 except_value = [str(v).lower() if isinstance(v, bool) else v for v in except_value]
                 return FieldCondition(
                     key=key,
@@ -214,6 +215,7 @@ class QdrantClient:
                 any_value = value['any']
                 if not isinstance(any_value, list):
                     any_value = [any_value]
+                # Don't convert booleans to strings
                 any_value = [str(v).lower() if isinstance(v, bool) else v for v in any_value]
                 return FieldCondition(
                     key=key,
@@ -221,14 +223,21 @@ class QdrantClient:
                 )
         elif isinstance(value, list):
             # Handle list of values (OR condition)
+            # Don't convert booleans to strings
             values = [str(v).lower() if isinstance(v, bool) else v for v in value]
             return FieldCondition(
                 key=key,
                 match=MatchAny(any=values)
             )
         else:
-            # Handle single value
-            value = str(value).lower() if isinstance(value, bool) else value
+            # Handle single value - keep booleans as is
+            if isinstance(value, bool):
+                return FieldCondition(
+                    key=key,
+                    match=MatchValue(value=value)
+                )
+            # Convert other values to strings if needed
+            value = str(value).lower() if isinstance(value, (str, int, float)) else value
             return FieldCondition(
                 key=key,
                 match=MatchValue(value=value)
